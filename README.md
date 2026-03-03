@@ -73,6 +73,7 @@ Para instalar o `Wine` no `Linux Ubuntu`, você pode seguir estas etapas:
 
     ```bash
     sudo dpkg --add-architecture i386
+    sudo apt update
     ```
 
 4. **Garantir que main + universe estão ativos**:
@@ -81,76 +82,47 @@ Para instalar o `Wine` no `Linux Ubuntu`, você pode seguir estas etapas:
     sudo add-apt-repository main
     sudo add-apt-repository universe
     sudo add-apt-repository multiverse
-    ```
-
-5. **Atualizar novamente**:
-
-    ```bash
     sudo apt update
     ```
 
-6. **Verificar se `libdw1:i386` existe**:
-
-    ```bash
-    apt policy libdw1:i386
-    ```
-
-    Você deve ver algo como:
-
-    ```bash
-    Candidate: 0.186-1ubuntu0.1
-    ```
-
-    Se aparecer `none`, ainda há problema no repositório.
-
-7. **Vamos alinhar manualmente as bibliotecas base para a mesma versão**: Execute:
-
-    ```bash
-    sudo apt install libelf1=0.186-1ubuntu0.1 libelf1:i386=0.186-1ubuntu0.1
-    ```
-
-8. **Adicionar o repositório:** baixar e adicionar a chave do repositório:
+5. **Adicionar o(s) repositório(s):** baixar e adicionar a chave do repositório:
 
     ```bash
     sudo mkdir -pm755 /etc/apt/keyrings
     sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-    ```
-
-9. **Primeiro descubra sua versão**:
-
-    ```bash
-    lsb_release -a
-    ```
-
-10. **Adicionar o repositório correto para sua versão do `Linux Ubuntu`**: 
-
-    ```bash
-    sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
-    ```
-
-11. **Atualizar novamente**:
-
-    ```bash
+    sudo wget -NP /etc/apt/sources.list.d/ \
+        https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
     sudo apt update
     ```
 
-12. **Instalar o `Wine`**: Você pode escolher entre:
-
- - **Versão estável (recomendado)**:
+6. **Instalar o `Wine`**:
 
     ```bash
-    sudo apt install wine-stable
-    sudo apt install --install-recommends winehq-stable
+    sudo apt install --install-recommends winehq-stable -y
     ```
 
-    - **Versão staging (mais experimental)**:
+7. **Criar o prefixo inicial do `Wine`** Na primeira execução, rode:
 
     ```bash
-    sudo apt install wine-stable
-    sudo apt install --install-recommends winehq-staging
+    winecfg
     ```
 
-13. **Verificar instalação**
+    Isso irá:
+
+    - Criar o diretório `~/.wine`
+
+    - Configurar ambiente Windows padrão (geralmente `Windows 10`)
+
+    - Instalar componentes básicos
+
+8. Ao abrir a janela de configuração, está tudo certo, cliclar em `Install`:
+
+    <div align="center">
+        <img src="docs/figures/wine_mono_installer.png" alt="Minha Imagem" />
+        <p>Fig. 1 Wine Mono Installer.</p>
+    </div>        
+
+9. **Verificar instalação**
 
     ```bash
     wine --version
@@ -159,43 +131,33 @@ Para instalar o `Wine` no `Linux Ubuntu`, você pode seguir estas etapas:
     Se aparecer algo como:
 
     ```bash
-    wine-9.x
+    wine-11.x
     ```
 
     Está instalado corretamente.
 
-14. **Criar o prefixo inicial do `Wine`** Na primeira execução, rode:
-
-    ```bash
-    winecfg
-    ```
-
-    Isso irá:
-
-    - Criar o diretório ~/.wine
-
-    - Configurar ambiente Windows padrão (geralmente `Windows 10`)
-
-    - Instalar componentes básicos
-
-    Se abrir a janela de configuração, está tudo certo.
-
-15. Quando a GUI do `Wine` abrir, clicar em `Install`
-
-16. **Verificar arquitetura ativa**:
-
-    ```bash
-    wine --version
-    ```
-
-17. **Instalar o `winetricks`**:
+10. **Instalar o `winetricks`**:
 
     ```bash
     sudo apt install winetricks -y
     ```
 
+11. **Verificar versão do `winetricks`**:
 
-## 2. Código completo para configurar/instalar/usar
+    ```bash
+    winetricks --version
+    ```
+
+    Se aparecer algo como:
+
+    ```bash
+    20210206 - sha256sum: xxx
+    ```
+
+    Está instalado corretamente.
+
+
+### 1.2 Código completo para configurar/instalar/usar
 
 Para configurar/instalar/usar o `wine` no `Linux Ubuntu` sem precisar digitar linha por linha, você pode seguir estas etapas:
 
@@ -217,13 +179,48 @@ Para configurar/instalar/usar o `wine` no `Linux Ubuntu` sem precisar digitar li
     sudo apt list --upgradable
     sudo apt full-upgrade -y
     sudo dpkg --add-architecture i386
+    sudo apt update
+    sudo add-apt-repository main
+    sudo add-apt-repository universe
+    sudo add-apt-repository multiverse
+    sudo apt update
     sudo mkdir -pm755 /etc/apt/keyrings
     sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+    sudo wget -NP /etc/apt/sources.list.d/ \
+        https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+    sudo apt update
+    sudo apt install --install-recommends winehq-stable -y
+    wine --version
+    winecfg
+    sudo apt install winetricks -y
+    winetricks --version
     ```
+
+## 2. Troubleshooting: conflito entre versões `amd66` e `i386`
+
+Se ocorrer erro como:
+
+```bash
+libgstreamer1.0-0:i386 : Depends: libdw1:i386
+```
+
+Verifique as versões:
+
+```bash
+apt policy libelf1 libelf1:i386
+```
+
+Se as versões forem diferentes, pode ser necessário alinhar manualmente:
+
+```bash
+sudo apt install libelf1=<versao> libelf1:i386=<versao>
+```
+
+Substitua `<versao>` pela versão disponível no seu sistema.
 
 ## Referências
 
-[1] OPENAI. ***Instalar o `wine` no `linux ubuntu` pelo `terminal emulator`.*** Disponível em: <https://chat.openai.com/c/b640a25d-f8e3-4922-8a3b-ed74a2657e42> (texto adaptado). Acessado em: 02/03/2026 00:37.
+[1] OPENAI. ***Instalar o `wine` no `linux ubuntu` pelo `terminal emulator`.*** Disponível em: <https://chatgpt.com/g/g-p-6980caf949648191ad6acfcdbe590f9e-instalar/c/69a549e6-0bac-8328-afc9-8d03a4a89441> (texto adaptado). Acessado em: 02/03/2026 00:37.
 
 [2] WINE HQ TEAM. ***Ubuntu winehq repository.*** Disponível em: <https://wiki.winehq.org/Ubuntu> (texto adaptado). Acessado em: 21/10/2023 00:09.
 
