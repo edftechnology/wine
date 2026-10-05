@@ -196,7 +196,7 @@ Para configurar/instalar/usar o `wine` no `Linux Ubuntu` sem precisar digitar li
     winetricks --version
     ```
 
-## 2. Troubleshooting: conflito entre versões `amd66` e `i386`
+## 2. _Troubleshooting_: conflito entre versões `amd66` e `i386`
 
 Se ocorrer erro como:
 
@@ -218,12 +218,75 @@ sudo apt install libelf1=<versao> libelf1:i386=<versao>
 
 Substitua `<versao>` pela versão disponível no seu sistema.
 
+## 3. Consultar as configurações do `wine` para um determinado repo
+
+1. Para listar os prefixos `Wine` existentes no seu diretório pessoal, você pode começar com:
+
+    ```bash
+    find "$HOME" -maxdepth 2 -type f -name system.reg \
+        -printf '%h\n' 2>/dev/null
+    ```
+
+    Como todo prefixo normalmente possui `system.reg`, você poderá obter algo como:
+
+    ```bash
+    /home/edenedfsls/.wine
+    /home/edenedfsls/.wine-gaseq
+    /home/edenedfsls/.wine-office365
+    ```
+
+2. Para consultar a configuração de um prefixo específico, há alguns comandos úteis:
+
+    ```bash
+    # Abrir a configuracao grafica
+    WINEPREFIX="$HOME/.wine-gaseq" winecfg
+
+    # Abrir o registro desse prefixo
+    WINEPREFIX="$HOME/.wine-gaseq" wine regedit
+
+    # Abrir o painel de controle
+    WINEPREFIX="$HOME/.wine-gaseq" wine control
+
+    # Ver os programas instalados pelo Wine
+    WINEPREFIX="$HOME/.wine-gaseq" \
+        wine uninstaller
+    ```
+
+3. Para descobrir a versão do `Windows` configurada naquele prefixo, uma forma prática é:
+
+    ```bash
+    grep -A 5 'Software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion' \
+        "$HOME/.wine-gaseq/system.reg"
+    ```
+
+    E, se você estiver usando Winetricks, pode consultar várias informações do prefixo:
+
+    ```bash
+    WINEPREFIX="$HOME/.wine-gaseq" winetricks list-installed
+    ```
+
+    Isso é particularmente útil porque mostra componentes adicionais instalados naquele ambiente, por exemplo:
+
+    ```bash
+    corefonts
+    vcrun2019
+    dotnet48
+    ```
+
 ## Referências
 
-[1] OPENAI. ***Instalar o `wine` no `linux ubuntu` pelo `terminal emulator`.*** Disponível em: <https://chatgpt.com/g/g-p-6980caf949648191ad6acfcdbe590f9e-instalar/c/69a549e6-0bac-8328-afc9-8d03a4a89441> (texto adaptado). Acessado em: 02/03/2026 00:37.
+[1] OPENAI.
+**Instalar o `wine` no `linux ubuntu` pelo `terminal emulator`.**
+Disponível em: <https://chatgpt.com/g/g-p-6980caf949648191ad6acfcdbe590f9e-instalar/c/69a549e6-0bac-8328-afc9-8d03a4a89441> (texto adaptado). ChatGPT.
+Acessado em: 02/03/2026 00:37.
 
-[2] WINE HQ TEAM. ***Ubuntu winehq repository.*** Disponível em: <https://wiki.winehq.org/Ubuntu> (texto adaptado). Acessado em: 21/10/2023 00:09.
+[2] WINE HQ TEAM.
+**Ubuntu winehq repository.**
+Disponível em: <https://wiki.winehq.org/Ubuntu> (texto adaptado).
+ChatGPT.
+Acessado em: 21/10/2023 00:09.
 
-[3] OPENAI. ***Vs code: editor popular.*** Disponível em: <https://chat.openai.com/c/b640a25d-f8e3-4922-8a3b-ed74a2657e42> (texto adaptado). Acessado em: 09/02/2024 00:37.
-
-
+[3] OPENAI.
+**Vs code: editor popular.**
+Disponível em: <https://chat.openai.com/c/b640a25d-f8e3-4922-8a3b-ed74a2657e42> (texto adaptado).
+Acessado em: 09/02/2024 00:37.
